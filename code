@@ -1,0 +1,33 @@
+for url in urls:
+    #print(url)
+    
+    results= requests.get(url)
+    #print(results) 
+    
+    soup = BeautifulSoup(results.text,"html.parser")
+    charizard = soup.find_all("h1")
+    #print(charizard) 
+    
+    #using regex to try to get rid of html 
+    
+    pokemonName = re.findall("C[^<]*", str(charizard))
+    #print(pokemonName)
+    #regex to take html tags out called name  
+    
+    name= ''.join(str(x) for x in pokemonName)
+    #print(name) # making the name with no html into a string 
+    
+    pokestats = soup.find_all("table",class_="vitals-table")
+    #pokemon soup
+    
+    ability= ''.join(str(x) for x in pokestats)
+    #print(ability) # bility shows but take out html
+    
+    pokemonmoves = re.findall(">[^<>]*", str(ability))
+    #print(pokemonmoves)# failled regex use ability 
+    
+    data = {
+        "pokemon": [name,ability],}
+    df = pd.DataFrame(data, index = ["Name","Attribute"])
+    print(df) #ability doont work in df 
+    
