@@ -1,33 +1,36 @@
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+
+urls = ['https://pokemondb.net/pokedex/charmander', 'https://pokemondb.net/pokedex/charmeleon', 'https://pokemondb.net/pokedex/charizard']
+
+# List of column names for the dataframe
+columns = ["Name","Species","Height","Weight","HP","Attack","Defense"]
+
+# Empty list to store the data for each Pokemon
+data_list = []
+
+# Loop through each URL
 for url in urls:
-    #print(url)
     
-    results= requests.get(url)
-    #print(results) 
+    # Make a request to the URL and get the HTML content 
+    results = requests.get(url)
+    soup = BeautifulSoup(results.text, "html.parser")
+    # Find the name of the Pokemon
+    name = soup.find_all("h1")[0].get_text()
     
-    soup = BeautifulSoup(results.text,"html.parser")
-    charizard = soup.find_all("h1")
-    #print(charizard) 
+    # Find the Pokemon attributes
+    pokemon_data = [str(x.get_text()) for x in soup.find_all("td")] 
+    species = pokemon_data[2]
+    height = pokemon_data[3]
+    weight = pokemon_data[4]
+    hp = pokemon_data[15]
+    attack = pokemon_data[19]
+    defense = pokemon_data[17]
     
-    #using regex to try to get rid of html 
-    
-    pokemonName = re.findall("C[^<]*", str(charizard))
-    #print(pokemonName)
-    #regex to take html tags out called name  
-    
-    name= ''.join(str(x) for x in pokemonName)
-    #print(name) # making the name with no html into a string 
-    
-    pokestats = soup.find_all("table",class_="vitals-table")
-    #pokemon soup
-    
-    ability= ''.join(str(x) for x in pokestats)
-    #print(ability) # bility shows but take out html
-    
-    pokemonmoves = re.findall(">[^<>]*", str(ability))
-    #print(pokemonmoves)# failled regex use ability 
-    
-    data = {
-        "pokemon": [name,ability],}
-    df = pd.DataFrame(data, index = ["Name","Attribute"])
-    print(df) #ability doont work in df 
-    
+    # Store the data for the current Pokemon in a list
+    data = [name, species, height, weight, hp, attack, defense]
+    data_list.append(data)
+# Create a pandas dataframe from the data list and column names   
+df = pd.DataFrame(data_list, columns=columns )
+print(df)
