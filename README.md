@@ -1,4 +1,4 @@
-# Python
+# Pokemon charizards evaluation
 
 I utilized Beautiful Soup to extract information on Charizard's evolutions. 
 This involved scraping the attributes associated with each stage of Charizard's evolution.
