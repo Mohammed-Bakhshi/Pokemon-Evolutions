@@ -1,18 +1,36 @@
-# Pokemon Charizard    evaluation
-I wanted to try out web scraping with a simple project, so I decided to focus on Pokemon. I extracted the evaluation and stats for Charizard and put them into a Panda data frame for easy reading. 
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
 
+urls = ['https://pokemondb.net/pokedex/charmander', 'https://pokemondb.net/pokedex/charmeleon', 'https://pokemondb.net/pokedex/charizard']
 
+# List of column names for the dataframe
+columns = ["Name","Species","Height","Weight","HP","Attack","Defense"]
 
-# How I did it 
+# Empty list to store the data for each Pokemon
+data_list = []
 
-* Imported all the packages I will be using and defined the URLs I will be using
-* I made a list of collum names that I will be using for the panda data frame 
-* I manifested an empty list to store the data for each Pokemon
-* Looped through each URL
-*  For each URL, I used request to get the HTML content.
-*  Used BeautifulSoup to parse the HTML content.
-*   Extracted the name of the Pokemon from the HTML using the `find_all()` method.
-* Retrieved the Pokemon attributes such as species, height, weight, HP, attack, and defense from the HTML content using appropriate HTML tags and navigating through the structure.
-*   Stored the extracted data for each Pokemon in a list.
-*   Created a Pandas data frame from the collected data list and assigned column names.
-*   Printed the DataFrame to display the extracted information in a structured format.
+# Loop through each URL
+for url in urls:
+    
+    # Make a request to the URL and get the HTML content 
+    results = requests.get(url)
+    soup = BeautifulSoup(results.text, "html.parser")
+    # Find the name of the Pokemon
+    name = soup.find_all("h1")[0].get_text()
+    
+    # Find the Pokemon attributes
+    pokemon_data = [str(x.get_text()) for x in soup.find_all("td")] 
+    species = pokemon_data[2]
+    height = pokemon_data[3]
+    weight = pokemon_data[4]
+    hp = pokemon_data[15]
+    attack = pokemon_data[19]
+    defense = pokemon_data[17]
+    
+    # Store the data for the current Pokemon in a list
+    data = [name, species, height, weight, hp, attack, defense]
+    data_list.append(data)
+# Create a pandas dataframe from the data list and column names   
+df = pd.DataFrame(data_list, columns=columns )
+print(df)
